@@ -1,8 +1,4 @@
-import {
-  GithubFilled,
-  LockOutlined,
-  UserOutlined
-} from '@ant-design/icons';
+import { GithubFilled, LockOutlined, UserOutlined } from '@ant-design/icons';
 import { message } from 'antd';
 import React, { useEffect } from 'react';
 import { ProFormCheckbox, ProFormText, LoginForm } from '@ant-design/pro-form';
@@ -11,7 +7,7 @@ import Footer from '@/components/Footer';
 import styles from './index.less';
 import { login, oauthLogin } from '@/services/auth/api';
 
-
+const redirectUrl = 'http://localhost:8000/login';
 const Login: React.FC = (props: any) => {
   const { initialState, setInitialState } = useModel('@@initialState');
   const fetchUserInfo = async () => {
@@ -23,38 +19,35 @@ const Login: React.FC = (props: any) => {
   };
 
   const handleSubmit = async (values: API.LoginDTO) => {
-    const res = await login(values)
+    const res = await login(values);
     if (res.code === 200) {
-      message.success("登陆成功🪅")
-      localStorage.setItem("token", res.data)
+      message.success('登陆成功🪅');
+      localStorage.setItem('token', res.data);
       await fetchUserInfo();
       if (!history) return;
       const { query } = history.location;
-      const { redirect } = query as { redirect: string }
-      history.push(redirect || "/")
-      return
+      const { redirect } = query as { redirect: string };
+      history.push(redirect || '/');
+      return;
     }
   };
 
   useEffect(() => {
-    const { query } = props.location
+    const { query } = props.location;
     if (query.code && query.state) {
-      const hide = message.info("正在登陆")
-      oauthLogin({ ...query, source: 'gitee' }).then(res => {
+      const hide = message.info('正在登陆');
+      oauthLogin({ ...query, source: 'gitee', redirectUrl }).then((res) => {
         if (res.code === 200) {
-          hide()
-          message.success("登陆成功")
-          localStorage.setItem("token", res.data)
-          fetchUserInfo().then(res => {
-            history.push("/")
-
-          })
+          hide();
+          message.success('登陆成功');
+          localStorage.setItem('token', res.data);
+          fetchUserInfo().then(() => {
+            history.push('/');
+          });
         }
-      })
+      });
     }
-
-  }, [])
-
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -69,18 +62,18 @@ const Login: React.FC = (props: any) => {
           }}
           actions={[
             <span key="text">其他登陆方式：</span>,
-            <GithubFilled key="gitee"
+            <GithubFilled
+              key="gitee"
               onClick={() => {
-                window.location.href = "http://localhost:9001/oauth/render/gitee"
+                window.location.href =
+                  'http://localhost:9001/oauth/render/gitee?redirectUrl=' + redirectUrl;
               }}
-            />
-
+            />,
           ]}
           onFinish={async (values: API.LoginDTO) => {
             await handleSubmit(values);
           }}
         >
-
           <>
             <ProFormText
               name="username"

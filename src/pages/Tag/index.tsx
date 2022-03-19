@@ -11,7 +11,7 @@ import { useRef, useState } from 'react';
  *
  * @param fields
  */
-const { confirm } = Modal
+const { confirm } = Modal;
 
 const handleAdd = async (fields: Tag) => {
   const hide = message.loading('正在添加');
@@ -67,17 +67,15 @@ const handleRemove = async (id: number) => {
   }
 };
 
-
-
 export default () => {
-  const actionRef = useRef<ActionType>()
+  const actionRef = useRef<ActionType>();
   /** 新建窗口的弹窗 */
-  const [createModalVisible, handleModalVisible] = useState<boolean>(false)
+  const [createModalVisible, handleModalVisible] = useState<boolean>(false);
   /** 更新窗口的弹窗 */
-  const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false)
-  const [currentRow, setCurrentRow] = useState<Tag>()
-  const [form] = Form.useForm()
-  const [updateForm] = Form.useForm()
+  const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
+  const [currentRow, setCurrentRow] = useState<Tag>();
+  const [form] = Form.useForm();
+  const [updateForm] = Form.useForm();
   const columns: ProColumns<Tag>[] = [
     {
       title: 'Id',
@@ -89,19 +87,19 @@ export default () => {
       title: '标签名称',
       dataIndex: 'name',
       render: (_, record) => {
-        return <AntTag color="magenta">{record.name}</AntTag>
-      }
+        return <AntTag color="magenta">{record.name}</AntTag>;
+      },
     },
     {
       title: '排序',
       dataIndex: 'sort',
-      hideInSearch: true
+      hideInSearch: true,
     },
     {
       title: '创建时间',
       dataIndex: 'gmtCreate',
       valueType: 'dateTime',
-      hideInSearch: true
+      hideInSearch: true,
     },
     {
       title: '操作',
@@ -111,32 +109,31 @@ export default () => {
         <Button
           key="edit"
           onClick={async () => {
-            if (!record.id) return
-            const { data } = await getTagById(record.id)
+            if (!record.id) return;
+            const { data } = await getTagById(record.id);
             setCurrentRow(data);
-            updateForm.setFieldsValue(data)
+            updateForm.setFieldsValue(data);
             handleUpdateModalVisible(true);
           }}
         >
           编辑
         </Button>,
-        <Button key="remove" danger={true}
-          onClick={
-            () => {
-              confirm({
-                title: '确认删除改标签？',
-                icon: <ExclamationCircleOutlined />,
-                onOk: async () => {
-                  if (!record.id) return
-                  const sucess = await handleRemove(record.id);
-                  if (sucess) {
-                    actionRef.current?.reload()
-                  }
+        <Button
+          key="remove"
+          danger={true}
+          onClick={() => {
+            confirm({
+              title: '确认删除改标签？',
+              icon: <ExclamationCircleOutlined />,
+              onOk: async () => {
+                if (!record.id) return;
+                const sucess = await handleRemove(record.id);
+                if (sucess) {
+                  actionRef.current?.reload();
                 }
-
-              });
-            }
-          }
+              },
+            });
+          }}
         >
           删除
         </Button>,
@@ -145,7 +142,7 @@ export default () => {
   ];
 
   return (
-    <PageContainer >
+    <PageContainer>
       <ProTable<Tag, API.PageParams>
         headerTitle="标签列表"
         actionRef={actionRef}
@@ -158,19 +155,19 @@ export default () => {
             type="primary"
             key="primary"
             onClick={() => {
-              handleModalVisible(true)
+              handleModalVisible(true);
             }}
           >
             <PlusOutlined /> 新建
           </Button>,
         ]}
         request={async (params) => {
-          const res = await getTags(params)
+          const res = await getTags(params);
           return {
             data: res.data.records,
             success: res.code == 200,
-            total: res.data.total
-          }
+            total: res.data.total,
+          };
         }}
         columns={columns}
       />
@@ -184,7 +181,7 @@ export default () => {
           const success = await handleAdd(value as Tag);
           if (success) {
             handleModalVisible(false);
-            form.resetFields()
+            form.resetFields();
             if (actionRef.current) {
               actionRef.current.reload();
             }
@@ -198,7 +195,7 @@ export default () => {
           placeholder="请输入标签名称"
           rules={[{ required: true, message: '请输入标签名称!' }]}
         />
-        <ProFormDigit width={"md"} label="排序" name="sort" min={1} max={10} />
+        <ProFormDigit width={'md'} label="排序" name="sort" min={1} max={10} />
       </ModalForm>
 
       <ModalForm
@@ -208,16 +205,16 @@ export default () => {
         visible={updateModalVisible}
         onVisibleChange={(flag) => {
           if (!flag) {
-            setCurrentRow(undefined)
+            setCurrentRow(undefined);
           }
-          handleUpdateModalVisible(flag)
+          handleUpdateModalVisible(flag);
         }}
         onFinish={async (value) => {
           const success = await handleUpdate({ id: currentRow?.id, ...value });
           if (success) {
-            setCurrentRow(undefined)
+            setCurrentRow(undefined);
+            updateForm.resetFields();
             handleUpdateModalVisible(false);
-            updateForm.resetFields()
             if (actionRef.current) {
               actionRef.current.reload();
             }
@@ -231,10 +228,8 @@ export default () => {
           placeholder="请输入标签名称"
           rules={[{ required: true, message: '请输入标签名称!' }]}
         />
-        <ProFormDigit width={"md"} label="排序" name="sort" min={1} max={10} />
+        <ProFormDigit width={'md'} label="排序" name="sort" min={1} max={10} />
       </ModalForm>
-
-
     </PageContainer>
   );
 };
